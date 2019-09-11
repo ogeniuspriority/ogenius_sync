@@ -116,3 +116,5 @@ if (count($appRemoteTables) >= 0) {
     echo "<span style='color:red;'>Test 5 failed!</span></br>";
     $appEnvSettings_Operational_level5 = false;
 }
+
+//---Tables integrity check

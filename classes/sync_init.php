@@ -94,7 +94,7 @@ class sync_init
             echo $link->error;
         }
     }
-    //---Get All Tables in local database
+    //---Get All Tables in remote database
     function getAllTablesInRemoteDatabase($DatabaseName, $DatabaseUser, $Host, $Password)
     {
         $user = rtrim($DatabaseUser);
@@ -115,4 +115,5 @@ class sync_init
             echo $link->error;
         }
     }
+    //--
 }
