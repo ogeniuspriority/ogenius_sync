@@ -70,12 +70,20 @@ foreach ($appSettingsBluePrint as $key => $value) {
         $key = explode("=", $value)[0];
         $val = explode("=", $value)[1];
         $appEnvSettings[$key] = $val;
+    } else if (preg_match('#^DATABASE_SYNC_ROW_FREQUENCY_PER_TABLE#', $value) === 1) {
+        // 
+        $key = explode("=", $value)[0];
+        $val = explode("=", $value)[1];
+        $appEnvSettings[$key] = $val;
     }
 }
+//---SYNC FREQUENCY--
+$SYNC_FREQUENCY = (int)rtrim($appEnvSettings["DATABASE_SYNC_ROW_FREQUENCY_PER_TABLE"]);
+echo"".$SYNC_FREQUENCY."</br>";
 //---Detect all configs--
 //print_r($appEnvSettings);
 //---Step1 see if the .cyumaconfig file is okay--
-if (count($appEnvSettings) == 10) {
+if (count($appEnvSettings) == 11) {
     echo "<span style='color:green;'>Test 1 passed!</span></br>";
     $appEnvSettings_Operational_level1 = true;
 } else {
@@ -200,9 +208,9 @@ foreach ($appLocalTables as $key => $value) {
     }
 }
 //--
-if($appEnvSettings_Operational_level7){
+if ($appEnvSettings_Operational_level7) {
     echo "<div style='color:green;'>Step Succeeded!</div>";
-}else{
+} else {
     echo "<div style='color:red;'>Step Failed!</div>";
 }
 //--Go over local database tables and check each one--
@@ -260,9 +268,31 @@ foreach ($appRemoteTables as $key => $value) {
     }
 }
 //--
-if($appEnvSettings_Operational_level8){
+if ($appEnvSettings_Operational_level8) {
     echo "<div style='color:green;'>Step Succeeded!</div>";
-}else{
+} else {
     echo "<div style='color:red;'>Step Failed!</div>";
 }
-//------
+//------Sync data from local to remote database
+foreach ($appLocalTables as $key => $value) {
+    if (in_array($value, $appRemoteTables)) {
+        echo "<span style='color:green;'>Table '$value' Match found in Remote database" . "</span></br>";
+        //--
+        $tableColumns = $init->getThisDatabaseTableStructure($appEnvSettings['DATABASE_LOCAL_DB_NAME'], $appEnvSettings['DATABASE_LOCAL_DB_USERNAME'], $appEnvSettings['DATABASE_LOCAL_DB_URL'],  $appEnvSettings['DATABASE_LOCAL_DB_PASSWORD'], $value);
+        $tableColumns_remote = $init->getThisDatabaseTableStructure($appEnvSettings['DATABASE_REMOTE_DB_NAME'], $appEnvSettings['DATABASE_REMOTE_DB_USERNAME'], $appEnvSettings['DATABASE_REMOTE_DB_URL'],  $appEnvSettings['DATABASE_REMOTE_DB_PASSWORD'], $value);
+        //----------Paginate the data
+    } else {
+        echo "<span style='color:red;'>Table '$value' Match not found in Remote database" . "</span></br>";
+    }
+}
+//------Sync data from remote  to local database
+foreach ($appRemoteTables as $key => $value) {
+    if (in_array($value, $appLocalTables)) {
+        echo "<span style='color:green;'>Table '$value' Match found in Local database" . "</span></br>";
+        $tableColumns = $init->getThisDatabaseTableStructure($appEnvSettings['DATABASE_LOCAL_DB_NAME'], $appEnvSettings['DATABASE_LOCAL_DB_USERNAME'], $appEnvSettings['DATABASE_LOCAL_DB_URL'],  $appEnvSettings['DATABASE_LOCAL_DB_PASSWORD'], $value);
+        $tableColumns_remote = $init->getThisDatabaseTableStructure($appEnvSettings['DATABASE_REMOTE_DB_NAME'], $appEnvSettings['DATABASE_REMOTE_DB_USERNAME'], $appEnvSettings['DATABASE_REMOTE_DB_URL'],  $appEnvSettings['DATABASE_REMOTE_DB_PASSWORD'], $value);
+
+    } else {
+        echo "<span style='color:red;'>Table '$value' Match not found in Local database" . "</span></br>";
+    }
+}
