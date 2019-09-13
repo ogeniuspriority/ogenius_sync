@@ -147,7 +147,7 @@ class sync_init
 
         $link = mysqli_connect($host, $user, $password, $dbase);
         $output = array();
-        if ($stmt = $link->query("SHOW COLUMNS FROM  $Tablename")) {
+        if ($stmt = $link->query("SELECT * FROM  $Tablename")) {
             //echo "No of records : " . $stmt->num_rows . "<br>";
             while ($row = $stmt->fetch_array()) {
                 $output[] = $row;
@@ -156,5 +156,65 @@ class sync_init
         } else {
             echo $link->error;
         }
+        return $output;
+    }
+    //--Count all in table--
+    function count_rows($DatabaseName, $DatabaseUser, $Host, $Password,$Tablename)
+    {
+        $user = rtrim($DatabaseUser);
+        $password = rtrim($Password);
+        $host = rtrim($Host);
+        $dbase = rtrim($DatabaseName);
+        //------
+
+
+        $link = mysqli_connect($host, $user, $password, $dbase);
+        $stmt = $link->query("SELECT * FROM $Tablename");
+        return (int)$stmt->num_rows;
+         
+    }
+    //---Find rows occurrence in remote database
+    function findOccurenceOftableDataInRemote($DatabaseName, $DatabaseUser, $Host, $Password,$Tablename)
+    {
+        $user = rtrim($DatabaseUser);
+        $password = rtrim($Password);
+        $host = rtrim($Host);
+        $dbase = rtrim($DatabaseName);
+
+
+        $link = mysqli_connect($host, $user, $password, $dbase);
+        $output = array();
+        if ($stmt = $link->query("SELECT * FROM  $Tablename")) {
+            //echo "No of records : " . $stmt->num_rows . "<br>";
+            while ($row = $stmt->fetch_array()) {
+                $output[] = $row;
+            }
+            return $output;
+        } else {
+            echo $link->error;
+        }
+        return $output;
+    }
+    //---Find rows occurrence in local database
+    function findOccurenceOftableDataInLocal($DatabaseName, $DatabaseUser, $Host, $Password,$Tablename)
+    {
+        $user = rtrim($DatabaseUser);
+        $password = rtrim($Password);
+        $host = rtrim($Host);
+        $dbase = rtrim($DatabaseName);
+
+
+        $link = mysqli_connect($host, $user, $password, $dbase);
+        $output = array();
+        if ($stmt = $link->query("SELECT * FROM  $Tablename")) {
+            //echo "No of records : " . $stmt->num_rows . "<br>";
+            while ($row = $stmt->fetch_array()) {
+                $output[] = $row;
+            }
+            return $output;
+        } else {
+            echo $link->error;
+        }
+        return $output;
     }
 }
