@@ -288,11 +288,28 @@ foreach ($appLocalTables as $key => $value) {
             echo "<div>Table:$value Nber of rows in total " . $countRowsInLocal . " <span style='color:green'> It can attempt sync!</span></div>";
             //---------Get All the data from the table and compare -- start with last id in config until that id olus frequency
             $RowsInLocal = $init->getAllDataInThisTable($appEnvSettings['DATABASE_LOCAL_DB_NAME'], $appEnvSettings['DATABASE_LOCAL_DB_USERNAME'], $appEnvSettings['DATABASE_LOCAL_DB_URL'],  $appEnvSettings['DATABASE_LOCAL_DB_PASSWORD'], $value);
-            print_r($RowsInLocal);
-            //----------
-             foreach ($RowsInLocal as $k1 => $v7) {
-                 # code...
-             }
+            //print_r($RowsInLocal);
+            //----------            
+            foreach ($RowsInLocal as $ky => $vae) {
+                # 
+                $track_records_query = "";
+                $count_t_009 = 0;
+                foreach ($vae as $k00 => $v00) {
+                    # code...     
+                    if ((int) $k00 > 0 || $k00 == "0") {
+                        continue;
+                    }
+                    //--
+                    if($count_t_009==0){
+                        $track_records_query .= " SELECT * FROM $value WHERE " . $k00 . "='$v00'";
+                    }else{
+                        $track_records_query .= " AND " . $k00 . "='$v00'";
+                    }                    
+                    $count_t_009++;
+                }
+                //----Search if the the record exists in remote database if not add it-----      
+                echo "$track_records_query<br/>";
+            }
             //----Prepare sql for check 
         } else { }
     } else {
