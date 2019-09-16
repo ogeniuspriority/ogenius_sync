@@ -281,11 +281,12 @@ foreach ($appLocalTables as $key => $value) {
         //$tableColumns = $init->getThisDatabaseTableStructure($appEnvSettings['DATABASE_LOCAL_DB_NAME'], $appEnvSettings['DATABASE_LOCAL_DB_USERNAME'], $appEnvSettings['DATABASE_LOCAL_DB_URL'],  $appEnvSettings['DATABASE_LOCAL_DB_PASSWORD'], $value);
         //$tableColumns_remote = $init->getThisDatabaseTableStructure($appEnvSettings['DATABASE_REMOTE_DB_NAME'], $appEnvSettings['DATABASE_REMOTE_DB_USERNAME'], $appEnvSettings['DATABASE_REMOTE_DB_URL'],  $appEnvSettings['DATABASE_REMOTE_DB_PASSWORD'], $value);
         //----------Paginate the data---also select until u find nothing--
+        //---Find in confict latest id count to start from when selecting and counting--
         $countRowsInLocal = $init->count_rows($appEnvSettings['DATABASE_LOCAL_DB_NAME'], $appEnvSettings['DATABASE_LOCAL_DB_USERNAME'], $appEnvSettings['DATABASE_LOCAL_DB_URL'],  $appEnvSettings['DATABASE_LOCAL_DB_PASSWORD'], $value);
-        //---Divide them into steps.
+        //---Divide them into steps.---
         if ($countRowsInLocal > 0) {
             echo "<div>Table:$value Nber of rows in total " . $countRowsInLocal . " <span style='color:green'> It can attempt sync!</span></div>";
-            //---------Get All the data from the table and compare
+            //---------Get All the data from the table and compare -- start with last id in config until that id olus frequency
             $RowsInLocal = $init->getAllDataInThisTable($appEnvSettings['DATABASE_LOCAL_DB_NAME'], $appEnvSettings['DATABASE_LOCAL_DB_USERNAME'], $appEnvSettings['DATABASE_LOCAL_DB_URL'],  $appEnvSettings['DATABASE_LOCAL_DB_PASSWORD'], $value);
             print_r($RowsInLocal);
             //----------
@@ -309,3 +310,14 @@ foreach ($appRemoteTables as $key => $value) {
         //echo "<span style='color:red;'>Table '$value' Match not found in Local database" . "</span></br>";
     }
 }
+/*
+$data = file('myfile'); // reads an array of lines
+function replace_a_line($data) {
+   if (stristr($data, 'certain word')) {
+     return "replaement line!\n";
+   }
+   return $data;
+}
+$data = array_map('replace_a_line',$data);
+file_put_contents('myfile', implode('', $data));
+*/
