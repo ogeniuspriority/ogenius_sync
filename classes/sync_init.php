@@ -116,7 +116,7 @@ class sync_init
         }
     }
     //--
-    function getThisDatabaseTableStructure($DatabaseName, $DatabaseUser, $Host, $Password,$Tablename)
+    function getThisDatabaseTableStructure($DatabaseName, $DatabaseUser, $Host, $Password, $Tablename)
     {
         $user = rtrim($DatabaseUser);
         $password = rtrim($Password);
@@ -137,7 +137,7 @@ class sync_init
         }
     }
     //--Get all Data in one table
-    function getAllDataInThisTable($DatabaseName, $DatabaseUser, $Host, $Password,$Tablename)
+    function getAllDataInThisTable($DatabaseName, $DatabaseUser, $Host, $Password, $Tablename)
     {
         $user = rtrim($DatabaseUser);
         $password = rtrim($Password);
@@ -159,7 +159,7 @@ class sync_init
         return $output;
     }
     //--Count all in table--
-    function count_rows($DatabaseName, $DatabaseUser, $Host, $Password,$Tablename)
+    function count_rows($DatabaseName, $DatabaseUser, $Host, $Password, $Tablename)
     {
         $user = rtrim($DatabaseUser);
         $password = rtrim($Password);
@@ -170,11 +170,10 @@ class sync_init
 
         $link = mysqli_connect($host, $user, $password, $dbase);
         $stmt = $link->query("SELECT * FROM $Tablename");
-        return (int)$stmt->num_rows;
-         
+        return (int) $stmt->num_rows;
     }
     //---Find rows occurrence in remote database
-    function findOccurenceOftableDataInRemote($DatabaseName, $DatabaseUser, $Host, $Password,$Tablename)
+    function findOccurenceOftableDataInRemote($DatabaseName, $DatabaseUser, $Host, $Password, $Tablename)
     {
         $user = rtrim($DatabaseUser);
         $password = rtrim($Password);
@@ -196,7 +195,7 @@ class sync_init
         return $output;
     }
     //---Find rows occurrence in local database
-    function findOccurenceOftableDataInLocal($DatabaseName, $DatabaseUser, $Host, $Password,$Tablename)
+    function findOccurenceOftableDataInLocal($DatabaseName, $DatabaseUser, $Host, $Password, $Tablename)
     {
         $user = rtrim($DatabaseUser);
         $password = rtrim($Password);
@@ -216,5 +215,40 @@ class sync_init
             echo $link->error;
         }
         return $output;
+    }
+    //---Find Run this query and return count
+    function runQueryAndCount($DatabaseName, $DatabaseUser, $Host, $Password, $SqlQuery)
+    {
+        $user = rtrim($DatabaseUser);
+        $password = rtrim($Password);
+        $host = rtrim($Host);
+        $dbase = rtrim($DatabaseName);
+
+
+        $link = mysqli_connect($host, $user, $password, $dbase);
+        $stmt = $link->query($SqlQuery);
+        return (int) $stmt->num_rows;
+    }
+    //---Add local row to remote table
+    function addLocalTableToRemoteTable($DatabaseName, $DatabaseUser, $Host, $Password, $SqlQuery)
+    {
+        $user = rtrim($DatabaseUser);
+        $password = rtrim($Password);
+        $host = rtrim($Host);
+        $dbase = rtrim($DatabaseName);
+        echo "" . $SqlQuery . "<br/>";
+
+
+        $link = mysqli_connect($host, $user, $password, $dbase);
+        $stmt = $link->query($SqlQuery);
+        $theError = mysqli_error($link);
+        if (strpos($theError, 'Duplicate entry') !== false) {
+            echo 'Duplicate entry mehn '.$theError;
+        }
+        if ($stmt) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

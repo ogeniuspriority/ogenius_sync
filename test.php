@@ -293,6 +293,8 @@ foreach ($appLocalTables as $key => $value) {
             foreach ($RowsInLocal as $ky => $vae) {
                 # 
                 $track_records_query = "";
+                $track_records_query_INSERT_FIELDS = "";
+                $track_records_query_INSERT_FIELDS_DATA = "";
                 $count_t_009 = 0;
                 foreach ($vae as $k00 => $v00) {
                     # code...     
@@ -300,15 +302,38 @@ foreach ($appLocalTables as $key => $value) {
                         continue;
                     }
                     //--
-                    if($count_t_009==0){
+                    if ($count_t_009 == 0) {
                         $track_records_query .= " SELECT * FROM $value WHERE " . $k00 . "='$v00'";
-                    }else{
+                        //---INSERT BLUEPRINT-
+                        $track_records_query_INSERT_FIELDS .= "INSERT INTO $value ($k00 ";
+                        $track_records_query_INSERT_FIELDS_DATA .= " VALUES ('$v00' ";
+                    } else {
                         $track_records_query .= " AND " . $k00 . "='$v00'";
-                    }                    
+                        //---INSERT BLUEPRINT-
+                        $track_records_query_INSERT_FIELDS .= ",$k00 ";
+                        $track_records_query_INSERT_FIELDS_DATA .= ",'$v00'";
+                    }
+                    //----                    
                     $count_t_009++;
                 }
-                //----Search if the the record exists in remote database if not add it-----      
-                echo "$track_records_query<br/>";
+                //--
+                $track_records_query_INSERT_FIELDS .= ")";
+                $track_records_query_INSERT_FIELDS_DATA .= ")";
+                //--
+                $track_records_query_INSERT_FIELDS .= $track_records_query_INSERT_FIELDS_DATA;
+                //echo "" . $track_records_query_INSERT_FIELDS . "</br>";
+                $track_records_query .= "  LIMIT " . $SYNC_FREQUENCY;
+                //----Search if the the record exists in remote database if not add it-----
+                $occurenceInRemoteDatabase = $init->runQueryAndCount($appEnvSettings['DATABASE_REMOTE_DB_NAME'], $appEnvSettings['DATABASE_REMOTE_DB_USERNAME'], $appEnvSettings['DATABASE_REMOTE_DB_URL'],  $appEnvSettings['DATABASE_REMOTE_DB_PASSWORD'], $track_records_query);
+                if ((int) $occurenceInRemoteDatabase <= 0) {
+                    echo "Occurence can be synced $occurenceInRemoteDatabase<br/>";
+                    //-----
+                    if ($init->addLocalTableToRemoteTable($appEnvSettings['DATABASE_REMOTE_DB_NAME'], $appEnvSettings['DATABASE_REMOTE_DB_USERNAME'], $appEnvSettings['DATABASE_REMOTE_DB_URL'],  $appEnvSettings['DATABASE_REMOTE_DB_PASSWORD'], $track_records_query_INSERT_FIELDS)) {
+                        echo "SYnced";
+                    } else {
+                        echo " Not SYnced";
+                    }
+                } else { }
             }
             //----Prepare sql for check 
         } else { }
@@ -322,7 +347,61 @@ foreach ($appRemoteTables as $key => $value) {
         //echo "<span style='color:green;'>Table '$value' Match found in Local database" . "</span></br>";
         //$tableColumns = $init->getThisDatabaseTableStructure($appEnvSettings['DATABASE_LOCAL_DB_NAME'], $appEnvSettings['DATABASE_LOCAL_DB_USERNAME'], $appEnvSettings['DATABASE_LOCAL_DB_URL'],  $appEnvSettings['DATABASE_LOCAL_DB_PASSWORD'], $value);
         // $tableColumns_remote = $init->getThisDatabaseTableStructure($appEnvSettings['DATABASE_REMOTE_DB_NAME'], $appEnvSettings['DATABASE_REMOTE_DB_USERNAME'], $appEnvSettings['DATABASE_REMOTE_DB_URL'],  $appEnvSettings['DATABASE_REMOTE_DB_PASSWORD'], $value);
-
+        $countRowsInLocal = $init->count_rows($appEnvSettings['DATABASE_REMOTE_DB_NAME'], $appEnvSettings['DATABASE_REMOTE_DB_USERNAME'], $appEnvSettings['DATABASE_REMOTE_DB_URL'],  $appEnvSettings['DATABASE_REMOTE_DB_PASSWORD'], $value);
+        //---Divide them into steps.---
+        if ($countRowsInLocal > 0) {
+            echo "<div>Table:$value Nber of rows in total " . $countRowsInLocal . " <span style='color:green'> It can attempt sync!</span></div>";
+            //---------Get All the data from the table and compare -- start with last id in config until that id olus frequency
+            $RowsInLocal = $init->getAllDataInThisTable($appEnvSettings['DATABASE_REMOTE_DB_NAME'], $appEnvSettings['DATABASE_REMOTE_DB_USERNAME'], $appEnvSettings['DATABASE_REMOTE_DB_URL'],  $appEnvSettings['DATABASE_REMOTE_DB_PASSWORD'], $value);
+            //print_r($RowsInLocal);
+            //----------            
+            foreach ($RowsInLocal as $ky => $vae) {
+                # 
+                $track_records_query = "";
+                $track_records_query_INSERT_FIELDS = "";
+                $track_records_query_INSERT_FIELDS_DATA = "";
+                $count_t_009 = 0;
+                foreach ($vae as $k00 => $v00) {
+                    # code...     
+                    if ((int) $k00 > 0 || $k00 == "0") {
+                        continue;
+                    }
+                    //--
+                    if ($count_t_009 == 0) {
+                        $track_records_query .= " SELECT * FROM $value WHERE " . $k00 . "='$v00'";
+                        //---INSERT BLUEPRINT-
+                        $track_records_query_INSERT_FIELDS .= "INSERT INTO $value ($k00 ";
+                        $track_records_query_INSERT_FIELDS_DATA .= " VALUES ('$v00' ";
+                    } else {
+                        $track_records_query .= " AND " . $k00 . "='$v00'";
+                        //---INSERT BLUEPRINT-
+                        $track_records_query_INSERT_FIELDS .= ",$k00 ";
+                        $track_records_query_INSERT_FIELDS_DATA .= ",'$v00'";
+                    }
+                    //----                    
+                    $count_t_009++;
+                }
+                //--
+                $track_records_query_INSERT_FIELDS .= ")";
+                $track_records_query_INSERT_FIELDS_DATA .= ")";
+                //--
+                $track_records_query_INSERT_FIELDS .= $track_records_query_INSERT_FIELDS_DATA;
+                //echo "" . $track_records_query_INSERT_FIELDS . "</br>";
+                $track_records_query .= "  LIMIT " . $SYNC_FREQUENCY;
+                //----Search if the the record exists in remote database if not add it-----
+                $occurenceInRemoteDatabase = $init->runQueryAndCount($appEnvSettings['DATABASE_LOCAL_DB_NAME'], $appEnvSettings['DATABASE_REMOTE_DB_USERNAME'], $appEnvSettings['DATABASE_LOCAL_DB_URL'],  $appEnvSettings['DATABASE_LOCAL_DB_PASSWORD'], $track_records_query);
+                if ((int) $occurenceInRemoteDatabase <= 0) {
+                    echo "Occurence can be synced $occurenceInRemoteDatabase<br/>";
+                    //-----
+                    if ($init->addLocalTableToRemoteTable($appEnvSettings['DATABASE_LOCAL_DB_NAME'], $appEnvSettings['DATABASE_LOCAL_DB_USERNAME'], $appEnvSettings['DATABASE_LOCAL_DB_URL'],  $appEnvSettings['DATABASE_LOCAL_DB_PASSWORD'], $track_records_query_INSERT_FIELDS)) {
+                        echo "SYnced";
+                    } else {
+                        echo " Not SYnced";
+                    }
+                } else { }
+            }
+            //----Prepare sql for check 
+        } else { }
     } else {
         //echo "<span style='color:red;'>Table '$value' Match not found in Local database" . "</span></br>";
     }
