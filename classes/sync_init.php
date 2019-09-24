@@ -4,10 +4,10 @@ class sync_init
     // Declare  properties
     public $global_settings = array();
     //---
-    function __construct()
+    function __construct($fileLoc)
     {
         $block = 1024 * 1024; //1MB or counld be any higher than HDD block_size*2
-        if ($fh = fopen(".cyumaconfig", "r")) {
+        if ($fh = fopen($fileLoc, "r")) {
             $left = '';
             while (!feof($fh)) { // read the file
                 $temp = fread($fh, $block);
