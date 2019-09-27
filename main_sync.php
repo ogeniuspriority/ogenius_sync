@@ -34,6 +34,14 @@
         });
     });
     //-----Lifecycle Timer---------------------
+    var mainTimer = window.setInterval(function() {
+        if (init_test_passed) {
+
+        } else {
+
+        }
+
+    }, 30000);
 
 
 
