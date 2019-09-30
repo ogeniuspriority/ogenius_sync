@@ -3,6 +3,7 @@
 <script>
     var init_test_passed = false;
     var appEnvSettings;
+    var remoteDomainUrlForFiles = "";
     $(document).ready(function() {
         $.ajax('init/init_sync.php', {
             type: 'GET', // http method
@@ -46,13 +47,15 @@
             var count = Object.keys(appEnvSettings).length;
             if (parseInt(count) == 11) {
 
-                $.ajax('init/init_sync.php', {
+                $.ajax('local_codebase/detect_if_local_database_exists.php', {
                     type: 'GET', // http method
                     data: {
                         myData: 'This is my data.'
                     }, // data to submit
                     success: function(data, status, xhr) {
-                        init_test_passed = true;
+                        if (status == "success") {
+
+                        }
                     },
                     error: function(jqXhr, textStatus, errorMessage) {
                         //$('p').append('Error' + errorMessage);
