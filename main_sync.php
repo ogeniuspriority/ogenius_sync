@@ -4,6 +4,8 @@
     var init_test_passed = false;
     var appEnvSettings;
     var remoteDomainUrlForFiles = "";
+    var appRemoteTables;
+    var appLocalTables;
     $(document).ready(function() {
         $.ajax('init/init_sync.php', {
             type: 'GET', // http method
@@ -61,6 +63,143 @@
                             if (data == "1") {
                                 console.log("Local database exists!!!");
                                 ///---Detect remote database--
+                                $.ajax(remoteDomainUrlForFiles + 'remote_codebase/detect_if_remote_database_exists.php', {
+                                    type: 'POST', // http method
+                                    data: {
+                                        DatabaseUser: document.getElementById("DATABASE_REMOTE_DB_USERNAME").value,
+                                        Password: document.getElementById("DATABASE_REMOTE_DB_PASSWORD").value,
+                                        Host: document.getElementById("DATABASE_REMOTE_DB_URL").value,
+                                        DatabaseName: document.getElementById("DATABASE_REMOTE_DB_NAME").value
+                                    }, // data to submit
+                                    success: function(data, status, xhr) {
+                                        if (status == "success") {
+
+                                            if (data == "1") {
+                                                console.log("Remote database exists!!!");
+                                                ///---See tables in local database--
+                                                $.ajax('local_codebase/see_tables_in_local_database.php', {
+                                                    type: 'POST', // http method
+                                                    data: {
+                                                        DatabaseUser: document.getElementById("DATABASE_LOCAL_DB_USERNAME").value,
+                                                        Password: document.getElementById("DATABASE_LOCAL_DB_PASSWORD").value,
+                                                        Host: document.getElementById("DATABASE_LOCAL_DB_URL").value,
+                                                        DatabaseName: document.getElementById("DATABASE_LOCAL_DB_NAME").value
+                                                    }, // data to submit
+                                                    success: function(data, status, xhr) {
+                                                        if (status == "success") {
+
+                                                            if (!data.includes("error")) {
+                                                                console.log("Tables in local found!");
+                                                                ///---See tables in remote database--
+                                                                $.ajax(remoteDomainUrlForFiles + 'remote_codebase/see_tables_in_remote_database.php', {
+                                                                    type: 'POST', // http method
+                                                                    data: {
+                                                                        DatabaseUser: document.getElementById("DATABASE_REMOTE_DB_USERNAME").value,
+                                                                        Password: document.getElementById("DATABASE_REMOTE_DB_PASSWORD").value,
+                                                                        Host: document.getElementById("DATABASE_REMOTE_DB_URL").value,
+                                                                        DatabaseName: document.getElementById("DATABASE_REMOTE_DB_NAME").value
+                                                                    }, // data to submit
+                                                                    success: function(data, status, xhr) {
+                                                                        if (status == "success") {
+
+                                                                            if (!data.includes("error")) {
+                                                                                console.log("Tables in remote found!");
+                                                                                ///---Get tables in local database--
+                                                                                $.ajax('local_codebase/see_tables_in_local_database.php', {
+                                                                                    type: 'POST', // http method
+                                                                                    data: {
+                                                                                        DatabaseUser: document.getElementById("DATABASE_LOCAL_DB_USERNAME").value,
+                                                                                        Password: document.getElementById("DATABASE_LOCAL_DB_PASSWORD").value,
+                                                                                        Host: document.getElementById("DATABASE_LOCAL_DB_URL").value,
+                                                                                        DatabaseName: document.getElementById("DATABASE_LOCAL_DB_NAME").value
+                                                                                    }, // data to submit
+                                                                                    success: function(dataLocalTables, status, xhr) {
+                                                                                        if (status == "success") {
+
+                                                                                            if (!dataLocalTables.includes("error")) {
+                                                                                                console.log("Tables in remote collected!");
+                                                                                                ///---Get tables in local database--
+                                                                                                var resJSON = JSON.parse(dataLocalTables);
+                                                                                                console.log(dataLocalTables);
+                                                                                                appLocalTables = resJSON;
+                                                                                                //---Get all tables in remote database
+                                                                                                $.ajax(remoteDomainUrlForFiles + 'remote_codebase/see_tables_in_remote_database.php', {
+                                                                                                    type: 'POST', // http method
+                                                                                                    data: {
+                                                                                                        DatabaseUser: document.getElementById("DATABASE_REMOTE_DB_USERNAME").value,
+                                                                                                        Password: document.getElementById("DATABASE_REMOTE_DB_PASSWORD").value,
+                                                                                                        Host: document.getElementById("DATABASE_REMOTE_DB_URL").value,
+                                                                                                        DatabaseName: document.getElementById("DATABASE_REMOTE_DB_NAME").value
+                                                                                                    }, // data to submit
+                                                                                                    success: function(dataRemoteTables, status, xhr) {
+                                                                                                        if (status == "success") {
+
+                                                                                                            if (!dataRemoteTables.includes("error")) {
+                                                                                                                console.log("Tables in remote collected!");
+                                                                                                                ///---Get tables in remote database--
+                                                                                                                var resJSON = JSON.parse(dataRemoteTables);
+                                                                                                                console.log(dataRemoteTables);
+                                                                                                                appRemoteTables = resJSON;
+                                                                                                            } else {
+                                                                                                                console.log(dataRemoteTables);
+                                                                                                            }
+
+                                                                                                        }
+                                                                                                    },
+                                                                                                    error: function(jqXhr, textStatus, errorMessage) {
+                                                                                                        //$('p').append('Error' + errorMessage);
+                                                                                                        //alert('Error' + errorMessage);
+                                                                                                        console.log("Table search in remote failure!!");
+                                                                                                    }
+                                                                                                });
+                                                                                            } else {
+                                                                                                console.log(dataLocalTables);
+                                                                                            }
+
+                                                                                        }
+                                                                                    },
+                                                                                    error: function(jqXhr, textStatus, errorMessage) {
+                                                                                        //$('p').append('Error' + errorMessage);
+                                                                                        //alert('Error' + errorMessage);
+                                                                                        console.log("Table search in local failure!!");
+                                                                                    }
+                                                                                });
+                                                                            } else {
+                                                                                console.log(data);
+                                                                            }
+
+                                                                        }
+                                                                    },
+                                                                    error: function(jqXhr, textStatus, errorMessage) {
+                                                                        //$('p').append('Error' + errorMessage);
+                                                                        //alert('Error' + errorMessage);
+                                                                        console.log("Table search in remote failure!!");
+                                                                    }
+                                                                });
+                                                            } else {
+                                                                console.log(data);
+                                                            }
+
+                                                        }
+                                                    },
+                                                    error: function(jqXhr, textStatus, errorMessage) {
+                                                        //$('p').append('Error' + errorMessage);
+                                                        //alert('Error' + errorMessage);
+                                                        console.log("Table search in local failure!!");
+                                                    }
+                                                });
+                                            } else {
+                                                console.log(data);
+                                            }
+
+                                        }
+                                    },
+                                    error: function(jqXhr, textStatus, errorMessage) {
+                                        //$('p').append('Error' + errorMessage);
+                                        //alert('Error' + errorMessage);
+                                        console.log("remote database does not exists!!");
+                                    }
+                                });
                             } else {
                                 console.log(data);
                             }
@@ -70,6 +209,7 @@
                     error: function(jqXhr, textStatus, errorMessage) {
                         //$('p').append('Error' + errorMessage);
                         //alert('Error' + errorMessage);
+                        console.log("Local database does not exists!!");
                     }
                 });
             } else {
