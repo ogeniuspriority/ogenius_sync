@@ -140,6 +140,50 @@
                                                                                                                 var resJSON = JSON.parse(dataRemoteTables);
                                                                                                                 console.log(dataRemoteTables);
                                                                                                                 appRemoteTables = resJSON;
+                                                                                                                //----Compare number of tables on all ends--
+                                                                                                                var countLocalTables = Object.keys(appLocalTables).length;
+                                                                                                                var countRemoteTables = Object.keys(appRemoteTables).length;
+                                                                                                                if (parseInt(countLocalTables) == parseInt(countRemoteTables)) {
+                                                                                                                    console.log("Tables in both remote and local database match!!" + "---" + countRemoteTables + " tables");
+                                                                                                                    console.log("Local to remote database tables comparisons")
+                                                                                                                    //------------Get Local table structure----------
+                                                                                                                    $.ajax('local_codebase/get_local_tables_each_one_structure.php', {
+                                                                                                                        type: 'POST', // http method
+                                                                                                                        data: {
+                                                                                                                            tablesInLocalDB: JSON.stringify(appLocalTables),
+                                                                                                                            tablesInRemoteDB: JSON.stringify(appRemoteTables),
+                                                                                                                            DatabaseUser: document.getElementById("DATABASE_LOCAL_DB_USERNAME").value,
+                                                                                                                            Password: document.getElementById("DATABASE_LOCAL_DB_PASSWORD").value,
+                                                                                                                            Host: document.getElementById("DATABASE_LOCAL_DB_URL").value,
+                                                                                                                            DatabaseName: document.getElementById("DATABASE_LOCAL_DB_NAME").value,                                                                                                                            
+                                                                                                                            DatabaseUser_REMOTE: document.getElementById("DATABASE_REMOTE_DB_USERNAME").value,
+                                                                                                                            Password_REMOTE: document.getElementById("DATABASE_REMOTE_DB_PASSWORD").value,
+                                                                                                                            Host_REMOTE: document.getElementById("DATABASE_REMOTE_DB_URL").value,
+                                                                                                                            DatabaseName_REMOTE: document.getElementById("DATABASE_REMOTE_DB_NAME").value
+                                                                                                                        }, // data to submit
+                                                                                                                        success: function(dataCompareTables, status, xhr) {
+                                                                                                                            if (status == "success") {
+
+                                                                                                                                if (!dataCompareTables.includes("error")) {
+                                                                                                                                    console.log("Tables comparison success!" + dataCompareTables);
+
+                                                                                                                                } else {
+                                                                                                                                    console.log(dataCompareTables);
+                                                                                                                                }
+
+                                                                                                                            }
+                                                                                                                        },
+                                                                                                                        error: function(jqXhr, textStatus, errorMessage) {
+                                                                                                                            //$('p').append('Error' + errorMessage);
+                                                                                                                            //alert('Error' + errorMessage);
+                                                                                                                            console.log("Tables comparison failure!");
+                                                                                                                        }
+                                                                                                                    });
+                                                                                                                    //----------------
+
+                                                                                                                } else {
+                                                                                                                    console.log("Tables in remote and local do not match!!")
+                                                                                                                }
                                                                                                             } else {
                                                                                                                 console.log(dataRemoteTables);
                                                                                                             }

@@ -136,6 +136,27 @@ class sync_init
             echo $link->error;
         }
     }
+    //--
+    function getThisDatabaseTableStructure_curl_post($DatabaseName, $DatabaseUser, $Host, $Password, $Tablename)
+    {
+        $user = rtrim($DatabaseUser);
+        $password = rtrim($Password);
+        $host = rtrim($Host);
+        $dbase = rtrim($DatabaseName);
+
+
+        $link = mysqli_connect($host, $user, $password, $dbase);
+        $output = array();
+        if ($stmt = $link->query("SHOW COLUMNS FROM  $Tablename")) {
+            //echo "No of records : " . $stmt->num_rows . "<br>";
+            while ($row = $stmt->fetch_array()) {
+                $output[] = $row;
+            }
+            return $output;
+        } else {
+            echo $link->error;
+        }
+    }
     //--Get all Data in one table
     function getAllDataInThisTable($DatabaseName, $DatabaseUser, $Host, $Password, $Tablename)
     {
