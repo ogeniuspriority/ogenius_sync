@@ -1,5 +1,6 @@
 <?php
 //--------------
+$remoteDomainUrlForFiles = $_POST['remoteDomainUrlForFiles'];
 function getThisDatabaseTableStructure($DatabaseName, $DatabaseUser, $Host, $Password, $Tablename)
 {
     $user = rtrim($DatabaseUser);
@@ -37,7 +38,7 @@ function getThisDatabaseTableStructure_curl_post($DatabaseName, $DatabaseUser, $
         'Tablename'   => $Tablename,
     ];
 
-    $ch = curl_init('http://localhost/ogenius_sync/remote_codebase/get_table_structure_remotely.php');
+    $ch = curl_init($GLOBALS["remoteDomainUrlForFiles"] . 'remote_codebase/get_table_structure_remotely.php');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
 
