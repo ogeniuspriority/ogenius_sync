@@ -48,12 +48,22 @@
             if (parseInt(count) == 11) {
 
                 $.ajax('local_codebase/detect_if_local_database_exists.php', {
-                    type: 'GET', // http method
+                    type: 'POST', // http method
                     data: {
-                        myData: 'This is my data.'
+                        DatabaseUser: document.getElementById("DATABASE_LOCAL_DB_USERNAME").value,
+                        Password: document.getElementById("DATABASE_LOCAL_DB_PASSWORD").value,
+                        Host: document.getElementById("DATABASE_LOCAL_DB_URL").value,
+                        DatabaseName: document.getElementById("DATABASE_LOCAL_DB_NAME").value
                     }, // data to submit
                     success: function(data, status, xhr) {
                         if (status == "success") {
+
+                            if (data == "1") {
+                                console.log("Local database exists!!!");
+                                ///---Detect remote database--
+                            } else {
+                                console.log(data);
+                            }
 
                         }
                     },
@@ -69,7 +79,7 @@
             console.log("Config Setup contains errors!")
         }
 
-    }, 30000);
+    }, 5000);
     //-----------------
 
 

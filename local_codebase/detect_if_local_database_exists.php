@@ -3,7 +3,7 @@ $DatabaseUser = $_POST['DatabaseUser'];
 $Password = $_POST['Password'];
 $Host = $_POST['Host'];
 $DatabaseName = $_POST['DatabaseName'];
-//--------------
+
 $user = rtrim($DatabaseUser);
 $password = rtrim($Password);
 $host = rtrim($Host);
@@ -15,7 +15,7 @@ $con = mysqli_connect($host, $user, $password, $dbase);
 // Check connection
 if (mysqli_connect_errno()) {
     //echo "Failed to connect to MySQL: " . mysqli_connect_error();
-    return false;
+    echo false;
 } else {
-    return true;
+    echo true;
 }
