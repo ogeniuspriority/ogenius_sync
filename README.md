@@ -10,6 +10,4 @@ Modify the js variable remoteDomainUrlForFiles to your own server php root folde
 Finally copy both files on local and remote servers.
  Tips: unable to sync duplicate entries in on both databases.
 
-
-
-
+ The application has an overall sync timer that you can also set
