@@ -122,7 +122,7 @@ function addLocalTableToRemoteTable_REMOTE($DatabaseName, $DatabaseUser, $Host, 
         'SqlQuery'   => $SqlQuery,
     ];
 
-    $ch = curl_init($GLOBALS["remoteDomainUrlForFiles"] . 'remote_codebase/get_table_structure_remotely.php');
+    $ch = curl_init($GLOBALS["remoteDomainUrlForFiles"] . 'remote_codebase/sync_local_to_remote_finalize.php');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
 

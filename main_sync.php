@@ -3,7 +3,7 @@
 <script>
     var init_test_passed = false;
     var appEnvSettings;
-    var remoteDomainUrlForFiles = "http://localhost/ogenius_sync/";
+    var remoteDomainUrlForFiles = "http://192.168.1.100/ogenius_sync/";
     var appRemoteTables;
     var appLocalTables;
     $(document).ready(function() {
@@ -65,12 +65,13 @@
                                 ///---Detect remote database--
                                 $.ajax(remoteDomainUrlForFiles + 'remote_codebase/detect_if_remote_database_exists.php', {
                                     type: 'POST', // http method
+                                    crossDomain: true,
                                     data: {
                                         DatabaseUser: document.getElementById("DATABASE_REMOTE_DB_USERNAME").value,
                                         Password: document.getElementById("DATABASE_REMOTE_DB_PASSWORD").value,
                                         Host: document.getElementById("DATABASE_REMOTE_DB_URL").value,
                                         DatabaseName: document.getElementById("DATABASE_REMOTE_DB_NAME").value,
-                                        remoteDomainUrlForFiles:remoteDomainUrlForFiles
+                                        remoteDomainUrlForFiles: remoteDomainUrlForFiles
                                     }, // data to submit
                                     success: function(data, status, xhr) {
                                         if (status == "success") {
@@ -94,12 +95,13 @@
                                                                 ///---See tables in remote database--
                                                                 $.ajax(remoteDomainUrlForFiles + 'remote_codebase/see_tables_in_remote_database.php', {
                                                                     type: 'POST', // http method
+                                                                    crossDomain: true,
                                                                     data: {
                                                                         DatabaseUser: document.getElementById("DATABASE_REMOTE_DB_USERNAME").value,
                                                                         Password: document.getElementById("DATABASE_REMOTE_DB_PASSWORD").value,
                                                                         Host: document.getElementById("DATABASE_REMOTE_DB_URL").value,
                                                                         DatabaseName: document.getElementById("DATABASE_REMOTE_DB_NAME").value,
-                                                                        remoteDomainUrlForFiles:remoteDomainUrlForFiles
+                                                                        remoteDomainUrlForFiles: remoteDomainUrlForFiles
                                                                     }, // data to submit
                                                                     success: function(data, status, xhr) {
                                                                         if (status == "success") {
@@ -127,12 +129,13 @@
                                                                                                 //---Get all tables in remote database
                                                                                                 $.ajax(remoteDomainUrlForFiles + 'remote_codebase/see_tables_in_remote_database.php', {
                                                                                                     type: 'POST', // http method
+                                                                                                    crossDomain: true,
                                                                                                     data: {
                                                                                                         DatabaseUser: document.getElementById("DATABASE_REMOTE_DB_USERNAME").value,
                                                                                                         Password: document.getElementById("DATABASE_REMOTE_DB_PASSWORD").value,
                                                                                                         Host: document.getElementById("DATABASE_REMOTE_DB_URL").value,
                                                                                                         DatabaseName: document.getElementById("DATABASE_REMOTE_DB_NAME").value,
-                                                                                                        remoteDomainUrlForFiles:remoteDomainUrlForFiles
+                                                                                                        remoteDomainUrlForFiles: remoteDomainUrlForFiles
                                                                                                     }, // data to submit
                                                                                                     success: function(dataRemoteTables, status, xhr) {
                                                                                                         if (status == "success") {
@@ -163,7 +166,7 @@
                                                                                                                             Password_REMOTE: document.getElementById("DATABASE_REMOTE_DB_PASSWORD").value,
                                                                                                                             Host_REMOTE: document.getElementById("DATABASE_REMOTE_DB_URL").value,
                                                                                                                             DatabaseName_REMOTE: document.getElementById("DATABASE_REMOTE_DB_NAME").value,
-                                                                                                                            remoteDomainUrlForFiles:remoteDomainUrlForFiles
+                                                                                                                            remoteDomainUrlForFiles: remoteDomainUrlForFiles
                                                                                                                         }, // data to submit
                                                                                                                         success: function(dataCompareTables, status, xhr) {
                                                                                                                             if (status == "success") {
@@ -185,7 +188,43 @@
                                                                                                                                             Host_REMOTE: document.getElementById("DATABASE_REMOTE_DB_URL").value,
                                                                                                                                             DatabaseName_REMOTE: document.getElementById("DATABASE_REMOTE_DB_NAME").value,
                                                                                                                                             DATABASE_SYNC_ROW_FREQUENCY_PER_TABLE: document.getElementById("DATABASE_SYNC_ROW_FREQUENCY_PER_TABLE").value,
-                                                                                                                                            remoteDomainUrlForFiles:remoteDomainUrlForFiles
+                                                                                                                                            remoteDomainUrlForFiles: remoteDomainUrlForFiles
+                                                                                                                                        }, // data to submit
+                                                                                                                                        success: function(dataCompareTables, status, xhr) {
+                                                                                                                                            if (status == "success") {
+
+                                                                                                                                                if (!dataCompareTables.includes("error")) {
+                                                                                                                                                    console.log("Tables comparison success!" + dataCompareTables);
+                                                                                                                                                    //--
+
+                                                                                                                                                } else {
+                                                                                                                                                    console.log(dataCompareTables);
+                                                                                                                                                }
+
+                                                                                                                                            }
+                                                                                                                                        },
+                                                                                                                                        error: function(jqXhr, textStatus, errorMessage) {
+                                                                                                                                            //$('p').append('Error' + errorMessage);
+                                                                                                                                            //alert('Error' + errorMessage);
+                                                                                                                                            console.log("Tables comparison failure!");
+                                                                                                                                        }
+                                                                                                                                    });
+                                                                                                                                    //----------------Bring the local data and go to the remote server and compare ----
+                                                                                                                                    $.ajax('remote_codebase/sync_from_remote_to_local.php', {
+                                                                                                                                        type: 'POST', // http method
+                                                                                                                                        data: {
+                                                                                                                                            tablesInLocalDB: JSON.stringify(appLocalTables),
+                                                                                                                                            tablesInRemoteDB: JSON.stringify(appRemoteTables),
+                                                                                                                                            DatabaseUser: document.getElementById("DATABASE_LOCAL_DB_USERNAME").value,
+                                                                                                                                            Password: document.getElementById("DATABASE_LOCAL_DB_PASSWORD").value,
+                                                                                                                                            Host: document.getElementById("DATABASE_LOCAL_DB_URL").value,
+                                                                                                                                            DatabaseName: document.getElementById("DATABASE_LOCAL_DB_NAME").value,
+                                                                                                                                            DatabaseUser_REMOTE: document.getElementById("DATABASE_REMOTE_DB_USERNAME").value,
+                                                                                                                                            Password_REMOTE: document.getElementById("DATABASE_REMOTE_DB_PASSWORD").value,
+                                                                                                                                            Host_REMOTE: document.getElementById("DATABASE_REMOTE_DB_URL").value,
+                                                                                                                                            DatabaseName_REMOTE: document.getElementById("DATABASE_REMOTE_DB_NAME").value,
+                                                                                                                                            DATABASE_SYNC_ROW_FREQUENCY_PER_TABLE: document.getElementById("DATABASE_SYNC_ROW_FREQUENCY_PER_TABLE").value,
+                                                                                                                                            remoteDomainUrlForFiles: remoteDomainUrlForFiles
                                                                                                                                         }, // data to submit
                                                                                                                                         success: function(dataCompareTables, status, xhr) {
                                                                                                                                             if (status == "success") {

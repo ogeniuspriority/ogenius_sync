@@ -1,4 +1,5 @@
 <?php
+header("Access-Control-Allow-Origin: *");
 $DatabaseUser = $_POST['DatabaseUser'];
 $Password = $_POST['Password'];
 $Host = $_POST['Host'];
